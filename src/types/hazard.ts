@@ -13,3 +13,5 @@ export interface HazardLayer {
     features: HazardFeature[];
     visible: boolean;
 }
+
+export type RainIntensity = 1 | 2 | 3 | 4 | 5;
