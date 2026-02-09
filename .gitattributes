@@ -1,0 +1,5 @@
+*.geojson filter=lfs diff=lfs merge=lfs -text
+public/data/flood25.geojson filter=lfs diff=lfs merge=lfs -text
+public/data/landslide.geojson filter=lfs diff=lfs merge=lfs -text
+public/data filter=lfs diff=lfs merge=lfs -text
+public/data/floo25.geojson filter=lfs diff=lfs merge=lfs -text
