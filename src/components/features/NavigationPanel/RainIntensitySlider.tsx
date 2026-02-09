@@ -10,11 +10,11 @@ interface RainIntensitySliderProps {
 }
 
 const LABELS: Record<RainIntensity, string> = {
-    1: "Very Light",
-    2: "Light",
-    3: "Moderate",
-    4: "Heavy",
-    5: "Extreme",
+    1: "Light",
+    2: "Moderate",
+    3: "Heavy",
+    4: "Intense",
+    5: "Torrential",
 };
 
 export default function RainIntensitySlider({
@@ -25,13 +25,13 @@ export default function RainIntensitySlider({
     const [internalValue, setInternalValue] = useState<RainIntensity>(value);
 
     return (
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2 w-full pr-5">
             {/* Top label */}
             <div className="flex justify-between text-sm text-gray-700">
                 <span>Rain Intensity</span>
                 <span className="font-medium">
-          RI_{internalValue} — {LABELS[internalValue]}
-        </span>
+                    RI_{internalValue} — {LABELS[internalValue]}
+                </span>
             </div>
 
             {/* Slider */}
