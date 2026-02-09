@@ -1,32 +1,38 @@
-"use client"
+"use client";
 
 import dynamic from "next/dynamic";
-import NavigationPanel from "@/components/features/NavigationPanel";
-import { useRouting } from "@/hooks/useRouting";
 import { useState } from "react";
-import { RouteType } from "@/types/routing";
-import { RainIntensity } from "@/types/hazard";
+import { useRouting } from "@/hooks/useRouting";
+import NavigationPanel from "@/components/features/NavigationPanel";
+import {RouteType} from "@/types/routing";
+import {RainIntensity} from "@/types/hazard";
 
-const LeafletMap = dynamic(
-    () => import("@/components/map/LeafletMap"),
-    { ssr : false }
-);
+const LeafletMap = dynamic(() => import("@/components/map/LeafletMap"), {
+    ssr: false,
+});
 
 export default function Home() {
-    const [routeType, setRouteType] = useState<RouteType>("balanced");
-    const [rainIntensity, setRainIntensity] = useState<RainIntensity>(3);
     const { executeRoute } = useRouting();
+    const [floodVisible, setFloodVisible] = useState(true);
+    const [landslideVisible, setLandslideVisible] = useState(true);
+
+    const handleExecute = (routeType: RouteType, rainIntensity: RainIntensity) => {
+        executeRoute(routeType, rainIntensity);
+    };
 
     return (
-        <div className="h-screen w-screen relative">
-            <LeafletMap />
+        <div className="relative h-screen w-screen">
+            <LeafletMap
+                floodVisible={floodVisible}
+                landslideVisible={landslideVisible}
+            />
             <NavigationPanel
-                routeType={routeType}
-                rainIntensity={rainIntensity}
-                onRouteChange={setRouteType}
-                onRainChange={setRainIntensity}
-                onExecute={() => executeRoute(routeType, rainIntensity)}
+                onExecute={handleExecute}
+                floodVisible={floodVisible}
+                landslideVisible={landslideVisible}
+                setFloodVisible={setFloodVisible}
+                setLandslideVisible={setLandslideVisible}
             />
         </div>
-      );
+    );
 }
