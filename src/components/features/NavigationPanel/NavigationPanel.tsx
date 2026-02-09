@@ -15,6 +15,34 @@ interface NavigationPanelProps {
     setLandslideVisible: (val: boolean) => void;
 }
 
+function HazardsCheckboxes({
+    floodVisible,
+    landslideVisible,
+    setFloodVisible,
+    setLandslideVisible,
+                           }){
+    return (
+        <div className="flex-col gap-4 items-center">
+            <label className="flex items-center gap-2 text-gray-700">
+                <input
+                    type="checkbox"
+                    checked={floodVisible}
+                    onChange={() => setFloodVisible(!floodVisible)}
+                />
+                Flood Hazard
+            </label>
+            <label className="flex items-center gap-2 text-gray-700">
+                <input
+                    type="checkbox"
+                    checked={landslideVisible}
+                    onChange={() => setLandslideVisible(!landslideVisible)}
+                />
+                Landslide Hazard
+            </label>
+        </div>
+    )
+}
+
 export default function NavigationPanel({
                                             onExecute,
                                             floodVisible,
@@ -26,29 +54,13 @@ export default function NavigationPanel({
     const [rainIntensity, setRainIntensity] = useState<RainIntensity>(3);
 
     return (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[90%] max-w-4xl p-4 bg-white shadow-lg rounded-lg flex flex-col gap-20">
+        <div
+            className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[90%] max-w-4xl p-4 bg-white shadow-lg rounded-lg flex flex-col gap-20">
             <div className="flex gap-4 items-center">
                 <RainIntensitySlider value={rainIntensity} onChange={setRainIntensity}/>
                 <RouteSelector value={routeType} onChange={setRouteType}/>
                 <ExecuteButton onClick={() => onExecute(routeType, rainIntensity)}/>
-                <div className="flex-col gap-4 items-center">
-                    <label className="flex items-center gap-2 text-gray-700">
-                        <input
-                            type="checkbox"
-                            checked={floodVisible}
-                            onChange={() => setFloodVisible(!floodVisible)}
-                        />
-                        Flood Hazard
-                    </label>
-                    <label className="flex items-center gap-2 text-gray-700">
-                        <input
-                            type="checkbox"
-                            checked={landslideVisible}
-                            onChange={() => setLandslideVisible(!landslideVisible)}
-                        />
-                        Landslide Hazard
-                    </label>
-                </div>
+                <HazardsCheckboxes floodVisible={floodVisible} landslideVisible={landslideVisible} setFloodVisible={setFloodVisible} setLandslideVisible={setLandslideVisible}/>
             </div>
         </div>
     );
