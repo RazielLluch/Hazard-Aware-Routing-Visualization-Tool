@@ -8,7 +8,10 @@ interface UseRoutingResult {
     route: RouteResult | null;
     isLoading: boolean;
     error: string | null;
-    executeRoute: (type: RouteType) => Promise<void>;
+    executeRoute: (
+        type: RouteType,
+        rainIntensity: RainIntensity
+    ) => Promise<void>;
 }
 
 export function useRouting(): UseRoutingResult {
@@ -16,27 +19,35 @@ export function useRouting(): UseRoutingResult {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const executeRoute = useCallback(async (type: RouteType) => {
-        setIsLoading(true);
-        setError(null);
+    const executeRoute = useCallback(
+        async (type: RouteType, rainIntensity: RainIntensity) => {
+            setIsLoading(true);
+            setError(null);
 
-        try {
-            const response = await fetch(`/api/routes?type=${type}`);
+            try {
+                const params = new URLSearchParams({
+                    type,
+                    rainIntensity: rainIntensity.toString(),
+                });
 
-            if (!response.ok) {
-                throw new Error(`Routing failed (${response.status})`);
+                const response = await fetch(`/api/routes?${params.toString()}`);
+
+                if (!response.ok) {
+                    throw new Error(`Routing failed (${response.status})`);
+                }
+
+                const data: RouteResult = await response.json();
+                setRoute(data);
+            } catch (err) {
+                setError(
+                    err instanceof Error ? err.message : "Unknown routing error"
+                );
+            } finally {
+                setIsLoading(false);
             }
-
-            const data: RouteResult = await response.json();
-            setRoute(data);
-        } catch (err) {
-            setError(
-                err instanceof Error ? err.message : "Unknown routing error"
-            );
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
+        },
+        []
+    );
 
     return {
         route,

@@ -1,25 +1,31 @@
 "use client";
 
-import { useState } from "react";
 import RouteSelector from "./RouteSelector";
 import ExecuteButton from "./ExecuteButton";
+import RainIntensitySlider from "./RainIntensitySlider";
 import type { RouteType } from "@/types/routing";
-import RainIntensitySlider from "@/components/features/NavigationPanel/RainIntensitySlider";
-import {RainIntensity} from "@/types/hazard";
+import type { RainIntensity } from "@/types/hazard";
 
 interface NavigationPanelProps {
-    onExecute: (routeType: RouteType) => void;
+    routeType: RouteType;
+    rainIntensity: RainIntensity;
+    onRouteChange: (value: RouteType) => void;
+    onRainChange: (value: RainIntensity) => void;
+    onExecute: () => void;
 }
 
-export default function NavigationPanel({ onExecute }: NavigationPanelProps) {
-    const [routeType, setRouteType] = useState<RouteType>("balanced");
-    const [rainIntensity, setRainIntensity] = useState<RainIntensity>(3);
-
+export default function NavigationPanel({
+                                            routeType,
+                                            rainIntensity,
+                                            onRouteChange,
+                                            onRainChange,
+                                            onExecute,
+                                        }: NavigationPanelProps) {
     return (
-        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[90%] max-w-xl p-4 bg-white shadow-lg rounded-lg flex gap-4 items-center">
-            <RainIntensitySlider value={rainIntensity} onChange={setRainIntensity}/>
-            <RouteSelector value={routeType} onChange={setRouteType} />
-            <ExecuteButton onClick={() => onExecute(routeType)} />
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-xl p-4 bg-white shadow-lg rounded-lg flex gap-4 items-center z-[1000]">
+            <RainIntensitySlider value={rainIntensity} onChange={onRainChange} />
+            <RouteSelector value={routeType} onChange={onRouteChange} />
+            <ExecuteButton onClick={onExecute} />
         </div>
     );
 }
