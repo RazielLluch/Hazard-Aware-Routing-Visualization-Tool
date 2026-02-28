@@ -15,8 +15,8 @@ export default function LeafletMap({
                                    }: LeafletMapProps) {
     return (
         <MapContainer
-            center={[14.5995, 120.9842]}
-            zoom={13}
+            center={[16.4484, 120.5905]}
+            zoom={14}
             className="absolute inset-0 z-0"
         >
             <BaseMapLayer />
