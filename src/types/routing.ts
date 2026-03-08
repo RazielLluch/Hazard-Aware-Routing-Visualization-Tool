@@ -13,10 +13,20 @@ export interface RouteSegment {
     hazardScore: number;
 }
 
+export interface DeliveryStop {
+    id: string;
+    location: Coordinate;
+    sequence: number;
+    label?: string;
+}
+
 export interface RouteResult {
     id: string;
     type: RouteType;
     segments: RouteSegment[];
+
+    deliveryStops: DeliveryStop[];
+
     totalDistanceMeters: number;
     totalTravelTimeSeconds: number;
     averageHazardScore: number;

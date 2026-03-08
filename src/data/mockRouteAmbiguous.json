@@ -1,0 +1,30 @@
+{
+  "id": "route-detailed-001",
+  "type": "safe",
+  "segments": [
+    {
+      "id": "segment-1",
+      "coordinates": [{"lat": 16.45382, "lng": 120.58012}, {"lat": 16.46613, "lng": 120.5984}],
+      "distanceMeters": 820,
+      "travelTimeSeconds": 120,
+      "hazardScore": 0.18
+    }
+  ],
+  "deliveryStops": [
+    {
+      "id": "stop-1",
+      "location": {"lat": 16.45382, "lng": 120.58012},
+      "sequence": 1,
+      "label": "Benguet Agri Pinoy Trading Center"
+    },
+    {
+      "id": "stop-2",
+      "location": {"lat": 16.46613, "lng": 120.5984},
+      "sequence": 2,
+      "label": "Saint Paul Chapel"
+    }
+  ],
+  "totalDistanceMeters": 1760,
+  "totalTravelTimeSeconds": 270,
+  "averageHazardScore": 0.25
+}
