@@ -56,7 +56,7 @@ export default function RouteLayer({ route, metadata }: RouteLayerProps) {
                     icon={stop.sequence == 1 ? depotIcon : stopIcon}
                 >
                     <Popup>
-                        Stop {stop.sequence}
+                        {stop.sequence == 1 ? "Depot" : "Stop " + (stop.sequence-1)}
                         {stop.label ? ` - ${stop.label}` : ""}
                     </Popup>
                 </Marker>
