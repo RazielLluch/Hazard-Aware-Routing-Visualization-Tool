@@ -45,13 +45,13 @@ export default function HazardLayer({
     const floodStyle = (feature: any) => ({
         color: floodColors[feature.properties.Var] || "blue",
         weight: 1,
-        fillOpacity: 0.9,
+        fillOpacity: 0.6,
     });
 
     const landslideStyle = (feature: any) => ({
         color: landslideColors[feature.properties.LH] || "brown",
         weight: 1,
-        fillOpacity: 0.9,
+        fillOpacity: 0.6,
     });
 
     return (
