@@ -28,6 +28,7 @@ export default function LeafletMap({
                 <HazardLayer
                     floodVisible={floodVisible}
                     landslideVisible={landslideVisible}
+                    fillOpacity={0.8}
                 />
             </Pane>
 
@@ -36,7 +37,7 @@ export default function LeafletMap({
                     route={routeData2}
                     metadata={{
                         color: "black",
-                        lineWeight: 6,
+                        lineWeight: 4,
                         opacity: 1
                     }}
                 />

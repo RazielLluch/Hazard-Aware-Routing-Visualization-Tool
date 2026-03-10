@@ -8,6 +8,7 @@ import { useLODGeoJSON } from "@/hooks/useLODGeoJSON";
 interface HazardLayerProps {
     floodVisible: boolean;
     landslideVisible: boolean;
+    fillOpacity: number;
 }
 
 // Define color maps for hazard levels
@@ -26,6 +27,7 @@ const landslideColors: Record<string, string> = {
 export default function HazardLayer({
                                         floodVisible,
                                         landslideVisible,
+                                        fillOpacity
                                     }: HazardLayerProps) {
     const map = useMap();
     const [zoom, setZoom] = useState(map.getZoom());
@@ -45,13 +47,13 @@ export default function HazardLayer({
     const floodStyle = (feature: any) => ({
         color: floodColors[feature.properties.Var] || "blue",
         weight: 1,
-        fillOpacity: 0.6,
+        fillOpacity: fillOpacity,
     });
 
     const landslideStyle = (feature: any) => ({
         color: landslideColors[feature.properties.LH] || "brown",
         weight: 1,
-        fillOpacity: 0.6,
+        fillOpacity: fillOpacity,
     });
 
     return (
