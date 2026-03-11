@@ -1,6 +1,7 @@
 "use client";
 
 import {MapContainer, Pane} from "react-leaflet";
+import L from 'leaflet';
 import HazardLayer from "./HazardLayers";
 import BaseMapLayer from "@/components/map/BaseMapLayer";
 import routeData1 from "@/data/mockRouteAmbiguous.json"
@@ -23,16 +24,13 @@ export default function LeafletMap({
             className="absolute inset-0 z-0"
         >
             <BaseMapLayer />
+            <HazardLayer
+                floodVisible={floodVisible}
+                landslideVisible={landslideVisible}
+                fillOpacity={0.8}
+            />
 
-            <Pane name="hazardPane" style={{ zIndex: 400 }}>
-                <HazardLayer
-                    floodVisible={floodVisible}
-                    landslideVisible={landslideVisible}
-                    fillOpacity={0.8}
-                />
-            </Pane>
-
-            <Pane name="routePane" style={{ zIndex: 500 }}>
+            <Pane name="routePane" style={{ zIndex: 200 }}>
                 <RouteLayer
                     route={routeData2}
                     metadata={{
