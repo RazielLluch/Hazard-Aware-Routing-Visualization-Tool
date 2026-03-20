@@ -7,6 +7,7 @@ import BaseMapLayer from "@/components/map/BaseMapLayer";
 import routeData1 from "@/data/mockRouteAmbiguous.json"
 import routeData2 from "@/data/mockRouteDetailed.json"
 import RouteLayer from "@/components/map/RouteLayer";
+import {RouteResponseModel} from "@/types/routing";
 
 interface LeafletMapProps {
     floodVisible: boolean;
@@ -32,7 +33,7 @@ export default function LeafletMap({
 
             <Pane name="routePane" style={{ zIndex: 200 }}>
                 <RouteLayer
-                    route={routeData2}
+                    route={routeData2 as RouteResponseModel}
                     metadata={{
                         color: "black",
                         lineWeight: 4,

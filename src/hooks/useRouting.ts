@@ -2,10 +2,10 @@
 
 import { useState, useCallback } from "react";
 import type { RainIntensity } from "@/types/hazard";
-import type { RouteType, RouteResult } from "@/types/routing";
+import type { RouteType, RouteResponseModel } from "@/types/routing";
 
 interface UseRoutingResult {
-    route: RouteResult | null;
+    route: RouteResponseModel | null;
     isLoading: boolean;
     error: string | null;
     executeRoute: (
@@ -15,7 +15,7 @@ interface UseRoutingResult {
 }
 
 export function useRouting(): UseRoutingResult {
-    const [route, setRoute] = useState<RouteResult | null>(null);
+    const [route, setRoute] = useState<RouteResponseModel | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -25,19 +25,20 @@ export function useRouting(): UseRoutingResult {
             setError(null);
 
             try {
-                const params = new URLSearchParams({
-                    type,
-                    rainIntensity: rainIntensity.toString(),
-                });
+                console.log("Execute Route triggered");
 
-                const response = await fetch(`/api/routes?${params.toString()}`);
-
+                const response = await fetch("http://127.0.0.1:8000");
                 if (!response.ok) {
-                    throw new Error(`Routing failed (${response.status})`);
+                    throw new Error(`API request failed (${response.status})`);
+
                 }
 
-                const data: RouteResult = await response.json();
-                setRoute(data);
+                const data = await response.json();
+                console.log("API Response:", data);
+
+                // Temporary: do not set route yet
+                // setRoute(data);
+
             } catch (err) {
                 setError(
                     err instanceof Error ? err.message : "Unknown routing error"

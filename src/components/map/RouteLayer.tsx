@@ -3,14 +3,14 @@
 import { Polyline, Marker, Popup } from "react-leaflet"
 import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { RouteResult, RouteMetadata } from "@/types/routing"
+import { RouteResponseModel, RouteMetadata } from "@/types/routing"
 import { renderToString } from "react-dom/server";
 import { PiWarehouseBold } from "react-icons/pi";
 import { FaMapMarkerAlt } from "react-icons/fa";
 
 
 interface RouteLayerProps {
-    route: RouteResult
+    route: RouteResponseModel
     metadata?: RouteMetadata
 }
 
@@ -32,6 +32,7 @@ export default function RouteLayer({ route, metadata }: RouteLayerProps) {
 
     return (
         <>
+
             {route.segments.map(segment => {
 
                 const positions = segment.coordinates.map(c => [c.lat, c.lng] as [number, number])
@@ -53,11 +54,11 @@ export default function RouteLayer({ route, metadata }: RouteLayerProps) {
                 <Marker
                     key={stop.id}
                     position={[stop.location.lat, stop.location.lng]}
-                    icon={stop.sequence == 1 ? depotIcon : stopIcon}
+                    icon={stop.sequence === 1? depotIcon : stopIcon}
                 >
                     <Popup>
-                        {stop.sequence == 1 ? "Depot" : "Stop " + (stop.sequence-1)}
-                        {stop.label ? ` - ${stop.label}` : ""}
+                        {stop.sequence === 1? "Depot" : `Stop ${stop.sequence! - 1}`}
+                        {stop.label ? ` - ${stop.label}` : `${stop.id === "1"? "depot" : ""}`}
                     </Popup>
                 </Marker>
             ))}

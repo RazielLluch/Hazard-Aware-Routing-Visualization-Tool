@@ -14,4 +14,4 @@ export interface HazardLayer {
     visible: boolean;
 }
 
-export type RainIntensity = 1 | 2 | 3 | 4 | 5;
+export type RainIntensity = "RI1" | "RI2" | "RI3" | "RI4" | "RI5";
