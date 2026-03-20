@@ -2,7 +2,7 @@
 
 import * as Slider from "@radix-ui/react-slider";
 import { useState } from "react";
-import type { RainIntensity } from "@/types/hazard";
+import {intToRI, RainIntensity, RIToInt} from "@/types/hazard";
 
 interface RainIntensitySliderProps {
     value: RainIntensity;
@@ -10,11 +10,11 @@ interface RainIntensitySliderProps {
 }
 
 const LABELS: Record<RainIntensity, string> = {
-    1: "Light",
-    2: "Moderate",
-    3: "Heavy",
-    4: "Intense",
-    5: "Torrential",
+    "RI1": "Light",
+    "RI2": "Moderate",
+    "RI3": "Heavy",
+    "RI4": "Intense",
+    "RI5": "Torrential",
 };
 
 export default function RainIntensitySlider({
@@ -30,21 +30,21 @@ export default function RainIntensitySlider({
             <div className="flex justify-between text-sm text-gray-700">
                 <span>Rain Intensity</span>
                 <span className="font-medium">
-                    RI_{internalValue} — {LABELS[internalValue]}
+                    {internalValue} — {LABELS[internalValue]}
                 </span>
             </div>
 
             {/* Slider */}
             <Slider.Root
                 className="relative flex items-center w-full h-4 select-none touch-none"
-                value={[internalValue]}
+                value={[RIToInt(internalValue)]}
                 min={1}
                 max={5}
                 step={1}
                 onValueChange={(val) => {
-                    const ri = val[0] as RainIntensity;
-                    setInternalValue(ri);
-                    onChange(ri);
+                    const ri = val[0];
+                    setInternalValue(intToRI(ri));
+                    onChange(intToRI(ri));
                 }}
             >
                 <Slider.Track className="bg-gray-200 relative grow h-1 rounded-full">

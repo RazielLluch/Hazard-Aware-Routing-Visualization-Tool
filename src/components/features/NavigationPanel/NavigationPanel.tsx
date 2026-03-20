@@ -7,6 +7,10 @@ import RainIntensitySlider from "./RainIntensitySlider";
 import type { RouteType } from "@/types/routing";
 import type { RainIntensity } from "@/types/hazard";
 
+import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+
 interface NavigationPanelProps {
     onExecute: (routeType: RouteType, rainIntensity: RainIntensity) => void;
     floodVisible: boolean;
@@ -16,31 +20,35 @@ interface NavigationPanelProps {
 }
 
 function HazardsCheckboxes({
-    floodVisible,
-    landslideVisible,
-    setFloodVisible,
-    setLandslideVisible,
-                           }){
+                               floodVisible,
+                               landslideVisible,
+                               setFloodVisible,
+                               setLandslideVisible,
+                           }: {
+    floodVisible: boolean;
+    landslideVisible: boolean;
+    setFloodVisible: (val: boolean) => void;
+    setLandslideVisible: (val: boolean) => void;
+}) {
     return (
-        <div className="flex-col gap-4 items-center">
-            <label className="flex items-center gap-2 text-gray-700">
-                <input
-                    type="checkbox"
+        <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+                <Checkbox
                     checked={floodVisible}
-                    onChange={() => setFloodVisible(!floodVisible)}
+                    onCheckedChange={(val) => setFloodVisible(!!val)}
                 />
-                Flood Hazard
-            </label>
-            <label className="flex items-center gap-2 text-gray-700">
-                <input
-                    type="checkbox"
+                <Label>Flood Hazard</Label>
+            </div>
+
+            <div className="flex items-center gap-2">
+                <Checkbox
                     checked={landslideVisible}
-                    onChange={() => setLandslideVisible(!landslideVisible)}
+                    onCheckedChange={(val) => setLandslideVisible(!!val)}
                 />
-                Landslide Hazard
-            </label>
+                <Label>Landslide Hazard</Label>
+            </div>
         </div>
-    )
+    );
 }
 
 export default function NavigationPanel({
@@ -51,17 +59,32 @@ export default function NavigationPanel({
                                             setLandslideVisible,
                                         }: NavigationPanelProps) {
     const [routeType, setRouteType] = useState<RouteType>("balanced");
-    const [rainIntensity, setRainIntensity] = useState<RainIntensity>(3);
+    const [rainIntensity, setRainIntensity] =
+        useState<RainIntensity>("RI3");
 
     return (
-        <div
-            className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[90%] max-w-4xl p-4 bg-white shadow-lg rounded-lg flex flex-col gap-20">
-            <div className="flex gap-4 items-center">
-                <RainIntensitySlider value={rainIntensity} onChange={setRainIntensity}/>
-                <RouteSelector value={routeType} onChange={setRouteType}/>
-                <ExecuteButton onClick={() => onExecute(routeType, rainIntensity)}/>
-                <HazardsCheckboxes floodVisible={floodVisible} landslideVisible={landslideVisible} setFloodVisible={setFloodVisible} setLandslideVisible={setLandslideVisible}/>
-            </div>
-        </div>
+        <Card className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[90%] max-w-4xl shadow-lg">
+            <CardContent className="p-4 flex flex-col gap-6">
+                <div className="flex flex-row gap-4 items-center">
+                    <RainIntensitySlider
+                        value={rainIntensity}
+                        onChange={setRainIntensity}
+                    />
+
+                    <RouteSelector value={routeType} onChange={setRouteType} />
+
+                    <ExecuteButton
+                        onClick={() => onExecute(routeType, rainIntensity)}
+                    />
+
+                    <HazardsCheckboxes
+                        floodVisible={floodVisible}
+                        landslideVisible={landslideVisible}
+                        setFloodVisible={setFloodVisible}
+                        setLandslideVisible={setLandslideVisible}
+                    />
+                </div>
+            </CardContent>
+        </Card>
     );
 }
