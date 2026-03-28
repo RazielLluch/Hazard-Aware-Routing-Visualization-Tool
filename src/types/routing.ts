@@ -26,6 +26,7 @@ export interface RouteRequestModel {
     id: string | null;
     rainIntensity: RainIntensity;
     routeType: RouteType;
+    depot: DeliveryStop;
     deliveryStops: DeliveryStop[];
 }
 
@@ -40,6 +41,7 @@ export interface RouteResponseModel {
     totalDistanceMeters?: number | null;
     totalTravelTimeSeconds?: number | null;
     averageHazardScore?: number | null;
+    status: string;
 }
 
 export interface RouteState {

@@ -9,6 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import {useRouteRequestStore} from "@/store/routeStore";
 
 interface RouteSelectorProps {
     value: RouteType;
@@ -17,17 +18,18 @@ interface RouteSelectorProps {
 
 const ROUTE_OPTIONS: RouteType[] = ["safe", "balanced", "fast"];
 
-export default function RouteSelector({
-                                          value,
-                                          onChange,
-                                      }: RouteSelectorProps) {
+export default function RouteSelector() {
+    const routeType = useRouteRequestStore((s) => s.routeType);
+    const setRouteType = useRouteRequestStore((s) => s.setRouteType);
+
+
     return (
         <div className="flex flex-col gap-2 min-w-[100px]">
             <span className="text-sm text-muted-foreground">
             Route Type
             </span>
 
-            <Select value={value} onValueChange={onChange}>
+            <Select value={routeType} onValueChange={setRouteType}>
                 <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select route" />
                 </SelectTrigger>

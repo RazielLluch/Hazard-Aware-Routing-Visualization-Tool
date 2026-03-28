@@ -1,23 +1,24 @@
-import {RouteRequestModel, RouteState} from "@/types/routing";
+import { RouteRequestModel, RouteResponseModel } from "@/types/routing";
 
-export function buildRouteRequest(state: RouteState): RouteRequestModel {
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-    const depot = state.stops.find(s => s.id === state.depotId)
+export async function requestRoute(
+    request: RouteRequestModel
+): Promise<RouteResponseModel> {
 
-    const orderedStops = [
-        depot!,
-        ...state.stops.filter(s => s.id !== state.depotId)
-    ]
+    console.log(JSON.stringify(request));
 
-    return {
-        id: null,
-        rainIntensity: state.rainIntensity,
-        routeType: state.routeType,
-        deliveryStops: orderedStops.map((stop, index) => ({
-            id: stop.id,
-            location: stop.location,
-            sequence: index + 1,
-            label: stop.label
-        }))
+    const res = await fetch(`${BASE_URL}/route/generate`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(request),
+    });
+
+    if (!res.ok) {
+        throw new Error("Failed to fetch route");
     }
+
+    return res.json();
 }
