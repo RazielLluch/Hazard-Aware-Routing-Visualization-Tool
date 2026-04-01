@@ -3,7 +3,7 @@ import { DeliveryStop } from "@/types/routing";
 import { Button } from "@/components/ui/button";
 
 type StopItemProps = {
-    stop?: DeliveryStop;
+    stop: DeliveryStop | null;
     index?: number;
     onRemove?: (index: number) => void;
     isDepot?: boolean;
@@ -27,7 +27,7 @@ export default function StopItem({
                     ? stop
                         ? `Depot - ${stop.label}`
                         : "No depot selected"
-                    : stop.label ? `${stop.label}` : ""
+                    : stop!.label ? `${stop!.label}` : ""
                 }
             </span>
                 {!isDepot && onRemove && index !== undefined && (
