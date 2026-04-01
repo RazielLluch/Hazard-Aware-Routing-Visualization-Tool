@@ -1,7 +1,7 @@
 // components/DeliveryStopsList.tsx
 import { DeliveryStop } from "@/types/routing";
-import { Button } from "@/components/ui/button"; // or any button component you use
 import { useRouteRequestStore } from "@/store/routeStore";
+import StopItem from "@/components/features/SideBar/StopItem";
 
 type DeliveryStopsListProps = {
     stops: DeliveryStop[];
@@ -18,19 +18,12 @@ export default function DeliveryStopsList({ stops }: DeliveryStopsListProps) {
     return (
         <div className="space-y-2 max-h-48 overflow-y-auto">
             {stops.map((stop, idx) => (
-                <div
+                <StopItem
                     key={idx}
-                    className="p-2 border rounded flex justify-between items-center"
-                >
-                    <span>{stop.label}</span>
-                    <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => removeStop(idx)}
-                    >
-                        Remove
-                    </Button>
-                </div>
+                    stop={stop}
+                    index={idx}
+                    onRemove={removeStop}
+                />
             ))}
         </div>
     );

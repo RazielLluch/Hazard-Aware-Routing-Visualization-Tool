@@ -9,6 +9,7 @@ import DeliveryStopsList from "@/components/features/SideBar/DeliveryStopsList";
 import LocationPopup from "@/components/LocationPopup";
 import {OSMSearchResult} from "@/types/search";
 import {createStopFromOSM} from "@/services/sidebarService";
+import StopItem from "@/components/features/SideBar/StopItem";
 
 export default function Sidebar() {
     const depot = useRouteRequestStore((s) => s.depot);
@@ -91,15 +92,9 @@ export default function Sidebar() {
                     ))}
                 </div>
             </section>
-
-            {/* Depot Section */}
             <section className="mb-6">
                 <h2 className="font-semibold mb-2">Depot</h2>
-                <div className="p-2 border rounded text-gray-700">
-                    {depot
-                        ? depot.label
-                        : "Depot not yet set"}
-                </div>
+                <StopItem stop={depot} isDepot />
             </section>
 
             {/* Delivery Stops Section */}
