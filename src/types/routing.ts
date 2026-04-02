@@ -44,6 +44,13 @@ export interface RouteResponseModel {
     status: string;
 }
 
+export type RouteCall = {
+    id: string; // important for tracking updates
+    request: RouteRequestModel;
+    response?: RouteResponseModel;
+    status: "idle" | "loading" | "success" | "error";
+};
+
 export interface RouteState {
     depotId?: string  | null;
     stops: DeliveryStop[];

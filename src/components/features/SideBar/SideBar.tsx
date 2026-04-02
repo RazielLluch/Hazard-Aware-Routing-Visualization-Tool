@@ -1,23 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { useRouteRequestStore } from "@/store/routeStore";
+import {useStopsStore} from "@/store/stopsStore";
 import { DeliveryStop } from "@/types/routing";
+import {OSMSearchResult} from "@/types/search";
 import {searchOSM} from "@/services/searchService";
 import SearchResultItem from "@/components/features/SideBar/SearchResultItem";
 import DeliveryStopsList from "@/components/features/SideBar/DeliveryStopsList";
 import LocationPopup from "@/components/LocationPopup";
-import {OSMSearchResult} from "@/types/search";
 import {createStopFromOSM} from "@/services/sidebarService";
 import StopItem from "@/components/features/SideBar/StopItem";
 
 export default function Sidebar() {
-    const depot = useRouteRequestStore((s) => s.depot);
-    const requestStops = useRouteRequestStore((s) => s.requestStops);
-    const addStop = useRouteRequestStore((s) => s.addStop);
-    const setDepot = useRouteRequestStore((s) => s.setDepot);
-    const selectedLocation = useRouteRequestStore((s) => s.selectedLocation);
-    const setSelectedLocation = useRouteRequestStore((s) => s.setSelectedLocation);
+    const { depot, requestStops, selectedLocation, addStop, setDepot, setSelectedLocation } = useStopsStore.getState();
 
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<OSMSearchResult[]>([]);

@@ -10,6 +10,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import {useRouteRequestStore} from "@/store/routeStore";
+import {useStopsStore} from "@/store/stopsStore";
 
 interface RouteSelectorProps {
     value: RouteType;
@@ -19,8 +20,7 @@ interface RouteSelectorProps {
 const ROUTE_OPTIONS: RouteType[] = ["safe", "balanced", "fast"];
 
 export default function RouteSelector() {
-    const routeType = useRouteRequestStore((s) => s.routeType);
-    const setRouteType = useRouteRequestStore((s) => s.setRouteType);
+    const { routeType, setRouteType } = useStopsStore.getState();
 
 
     return (

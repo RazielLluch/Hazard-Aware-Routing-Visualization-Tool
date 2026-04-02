@@ -1,5 +1,7 @@
 import {Coordinate} from "@/types/routing";
 
+export type MapMode = "input" | "output";
+
 export interface MapBounds {
     northEast: Coordinate;
     southWest: Coordinate;

@@ -3,7 +3,7 @@
 import * as Slider from "@radix-ui/react-slider";
 import {useCallback, useState} from "react";
 import {intToRI, RainIntensity, RIToInt} from "@/types/hazard";
-import {useRouteRequestStore} from "@/store/routeStore";
+import {useStopsStore} from "@/store/stopsStore";
 
 const LABELS: Record<RainIntensity, string> = {
     "RI1": "Light",
@@ -17,8 +17,7 @@ export default function RainIntensitySlider() {
     // single-thumb slider: state is optional, can be controlled from parent
     // const [internalValue, setInternalValue] = useState<RainIntensity>(value);
 
-    const rainIntensity = useRouteRequestStore((s) => s.rainIntensity);
-    const setRainIntensity = useRouteRequestStore((s) => s.setRainIntensity);
+    const { rainIntensity, setRainIntensity } = useStopsStore.getState();
 
     return (
         <div className="flex flex-col gap-2 w-full pr-5">
