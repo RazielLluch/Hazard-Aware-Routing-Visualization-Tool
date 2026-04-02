@@ -1,7 +1,6 @@
 "use client";
 
 import * as Slider from "@radix-ui/react-slider";
-import {useCallback, useState} from "react";
 import {intToRI, RainIntensity, RIToInt} from "@/types/hazard";
 import {useStopsStore} from "@/store/stopsStore";
 

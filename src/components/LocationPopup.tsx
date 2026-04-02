@@ -1,8 +1,6 @@
 // components/LocationPopup.tsx
 "use client";
 
-import { DeliveryStop } from "@/types/routing";
-
 type LocationPopupProps = {
     label: string;
     onLabelChange: (val: string) => void;

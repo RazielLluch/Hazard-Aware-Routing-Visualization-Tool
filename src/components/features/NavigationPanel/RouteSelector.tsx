@@ -9,13 +9,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import {useRouteRequestStore} from "@/store/routeStore";
 import {useStopsStore} from "@/store/stopsStore";
-
-interface RouteSelectorProps {
-    value: RouteType;
-    onChange: (value: RouteType) => void;
-}
 
 const ROUTE_OPTIONS: RouteType[] = ["safe", "balanced", "fast"];
 

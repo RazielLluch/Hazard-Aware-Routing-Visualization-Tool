@@ -3,9 +3,6 @@
 import { Button } from "@/components/ui/button";
 import {useRouteRequestStore} from "@/store/routeStore";
 
-interface ExecuteButtonProps {
-    onClick: () => void;
-}
 
 export default function ExecuteButton() {
 

@@ -1,13 +1,9 @@
 "use client";
 
 import {MapContainer, Pane} from "react-leaflet";
-import L from 'leaflet';
 import HazardLayer from "./HazardLayers";
 import BaseMapLayer from "@/components/map/BaseMapLayer";
-import routeData1 from "@/data/mockRouteAmbiguous.json"
-import routeData2 from "@/data/mockRouteDetailed.json"
 import RouteLayer from "@/components/map/RouteLayer";
-import {RouteResponseModel} from "@/types/routing";
 import {useRouteRequestStore} from "@/store/routeStore";
 
 interface LeafletMapProps {
