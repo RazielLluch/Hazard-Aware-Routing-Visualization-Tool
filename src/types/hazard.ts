@@ -1,3 +1,5 @@
+import { GeoJSON } from "geojson";
+
 export type HazardType = "flood" | "landslide";
 
 export interface HazardFeature {
