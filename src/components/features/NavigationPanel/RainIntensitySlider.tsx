@@ -16,7 +16,8 @@ export default function RainIntensitySlider() {
     // single-thumb slider: state is optional, can be controlled from parent
     // const [internalValue, setInternalValue] = useState<RainIntensity>(value);
 
-    const { rainIntensity, setRainIntensity } = useStopsStore.getState();
+    const rainIntensity = useStopsStore((state) => state.rainIntensity);
+    const setRainIntensity = useStopsStore((state) => state.setRainIntensity);
 
     return (
         <div className="flex flex-col gap-2 w-full pr-5">

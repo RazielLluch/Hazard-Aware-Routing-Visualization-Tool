@@ -14,7 +14,9 @@ import {useStopsStore} from "@/store/stopsStore";
 const ROUTE_OPTIONS: RouteType[] = ["safe", "balanced", "fast"];
 
 export default function RouteSelector() {
-    const { routeType, setRouteType } = useStopsStore.getState();
+
+    const routeType = useStopsStore((state) => state.routeType);
+    const setRouteType = useStopsStore((state) => state.setRouteType);
 
 
     return (

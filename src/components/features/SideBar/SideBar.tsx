@@ -12,7 +12,13 @@ import {createStopFromOSM} from "@/services/sidebarService";
 import StopItem from "@/components/features/SideBar/StopItem";
 
 export default function Sidebar() {
-    const { depot, requestStops, selectedLocation, addStop, setDepot, setSelectedLocation } = useStopsStore.getState();
+    const depot = useStopsStore((state) => state.depot);
+    const requestStops = useStopsStore((state) => state.requestStops);
+    const selectedLocation = useStopsStore((state) => state.selectedLocation);
+
+    const addStop = useStopsStore((state) => state.addStop);
+    const setDepot = useStopsStore((state) => state.setDepot);
+    const setSelectedLocation = useStopsStore((state) => state.setSelectedLocation);
 
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<OSMSearchResult[]>([]);
