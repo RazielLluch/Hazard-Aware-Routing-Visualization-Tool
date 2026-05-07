@@ -1,12 +1,10 @@
 "use client";
 
 import {MapContainer, Pane} from "react-leaflet";
-import L from 'leaflet';
 import HazardLayer from "./HazardLayers";
 import BaseMapLayer from "@/components/map/BaseMapLayer";
-import routeData1 from "@/data/mockRouteAmbiguous.json"
-import routeData2 from "@/data/mockRouteDetailed.json"
 import RouteLayer from "@/components/map/RouteLayer";
+import {useRouteRequestStore} from "@/store/routeStore";
 
 interface LeafletMapProps {
     floodVisible: boolean;
@@ -17,6 +15,9 @@ export default function LeafletMap({
                                        floodVisible,
                                        landslideVisible,
                                    }: LeafletMapProps) {
+
+    const routeCalls = useRouteRequestStore((s) => s.routeCalls);
+
     return (
         <MapContainer
             center={[16.4484, 120.5905]}
@@ -31,14 +32,19 @@ export default function LeafletMap({
             />
 
             <Pane name="routePane" style={{ zIndex: 200 }}>
-                <RouteLayer
-                    route={routeData2}
-                    metadata={{
-                        color: "black",
-                        lineWeight: 4,
-                        opacity: 1
-                    }}
-                />
+                {routeCalls
+                    .filter((call) => call.status === "success" && call.response)
+                    .map((call) => (
+                        <RouteLayer
+                            key={call.id}
+                            route={call.response!} // we know response exists
+                            metadata={{
+                                color: "black",
+                                lineWeight: 4,
+                                opacity: 1,
+                            }}
+                        />
+                    ))}
             </Pane>
 
         </MapContainer>

@@ -1,3 +1,5 @@
+import {RainIntensity} from "@/types/hazard";
+
 export type RouteType = "safe" | "balanced" | "fast";
 
 export interface Coordinate {
@@ -6,34 +8,58 @@ export interface Coordinate {
 }
 
 export interface RouteSegment {
-    id: string;
+    id?: string;
     coordinates: Coordinate[];
-    distanceMeters: number;
-    travelTimeSeconds: number;
-    hazardScore: number;
+    distanceMeters?: number | null;
+    travelTimeSeconds?: number | null;
+    hazardScore?: number | null;
 }
 
 export interface DeliveryStop {
-    id: string;
+    id?: string;
     location: Coordinate;
-    sequence: number;
-    label?: string;
+    sequence?: number | null;
+    label?: string | null;
 }
 
-export interface RouteResult {
-    id: string;
-    type: RouteType;
-    segments: RouteSegment[];
+export interface RouteRequestModel {
+    id: string | null;
+    rainIntensity: RainIntensity;
+    routeType: RouteType;
+    depot: DeliveryStop;
+    deliveryStops: DeliveryStop[];
+}
 
+export interface RouteResponseModel {
+    id: string; // UUID represented as string in TypeScript
+    type: RouteType;
+    rainIntensity: RainIntensity;
+    depot: DeliveryStop;
+    segments: RouteSegment[];
     deliveryStops: DeliveryStop[];
 
-    totalDistanceMeters: number;
-    totalTravelTimeSeconds: number;
-    averageHazardScore: number;
+    totalDistanceMeters?: number | null;
+    totalTravelTimeSeconds?: number | null;
+    averageHazardScore?: number | null;
+    status: string;
+}
+
+export type RouteCall = {
+    id: string; // important for tracking updates
+    request: RouteRequestModel;
+    response?: RouteResponseModel;
+    status: "idle" | "loading" | "success" | "error";
+};
+
+export interface RouteState {
+    depotId?: string  | null;
+    stops: DeliveryStop[];
+    rainIntensity: RainIntensity;
+    routeType: RouteType;
 }
 
 export interface RouteMetadata {
-    color?: string;
-    lineWeight?: number;
-    opacity?: number;
+    color?: string | null;
+    lineWeight?: number | null;
+    opacity?: number | null;
 }

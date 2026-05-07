@@ -1,16 +1,21 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {useRouteRequestStore} from "@/store/routeStore";
+
 interface ExecuteButtonProps {
-    onClick: () => void;
+    text?: string;
+    onClick?: () => void;
 }
 
-export default function ExecuteButton({ onClick }: ExecuteButtonProps) {
+export default function ExecuteButton({text, onClick} : ExecuteButtonProps) {
+    const addRouteCall = useRouteRequestStore((s) => s.addRouteCall);
+
+    const handleClick = onClick ?? addRouteCall
+
     return (
-        <button
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
-    onClick={onClick}
-        >
-      ▶ Apply
-    </button>
-);
+        <Button onClick={handleClick}>
+            {text ?? "▶ Apply"}
+        </Button>
+    );
 }
