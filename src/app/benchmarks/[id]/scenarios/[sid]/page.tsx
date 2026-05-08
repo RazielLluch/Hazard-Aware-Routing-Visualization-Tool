@@ -1,16 +1,7 @@
-import dynamic from "next/dynamic"
-
+import { ScenarioPlaybackShellLazy } from "@/components/scenario/ScenarioPlaybackShellLoader"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { api } from "@/lib/api"
 import type { AlgorithmId } from "@/types/api"
-
-const ScenarioPlaybackShell = dynamic(
-  () =>
-    import("@/components/scenario/ScenarioPlaybackShell").then(
-      (m) => m.ScenarioPlaybackShell,
-    ),
-  { ssr: false },
-)
 
 interface PageProps {
   params: Promise<{ id: string; sid: string }>
@@ -97,7 +88,7 @@ export default async function ScenarioPage({ params, searchParams }: PageProps) 
   }
 
   return (
-    <ScenarioPlaybackShell
+    <ScenarioPlaybackShellLazy
       benchmarkId={id}
       scenario={scenario}
       run={run}
