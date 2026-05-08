@@ -5,7 +5,12 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import React from "react";
 
-const inter = Inter({subsets:['latin'],variable:'--font-sans'});
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,11 +25,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Hazard Aware Last Mile Logistics",
   description:
-      "A Deep Reinforcement Learning Framework\n" +
-      "for Hazard-Aware Routing in\n" +
-      "Disaster-Prone Rural Road\n" +
-      "Networks: Leveraging Project\n" +
-      "NOAH Data for Last-Mile Logistics",
+    "A Deep Reinforcement Learning Framework for Hazard-Aware Routing in Disaster-Prone Rural Road Networks: Leveraging Project NOAH Data for Last-Mile Logistics",
 };
 
 export default function RootLayout({
@@ -34,10 +35,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={cn("font-sans", inter.variable)}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <TooltipProvider>
+          <SidebarProvider>
+            <AppSidebar />
+            <SidebarInset>
+              <SiteHeader />
+              {children}
+            </SidebarInset>
+          </SidebarProvider>
+        </TooltipProvider>
       </body>
     </html>
   );
