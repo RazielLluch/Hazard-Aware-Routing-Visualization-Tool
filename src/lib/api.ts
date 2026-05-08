@@ -2,6 +2,7 @@ import type {
   Benchmark,
   BenchmarkSummary,
   GraphInfo,
+  GraphNode,
   MetricsBundle,
   Page,
   Run,
@@ -100,6 +101,13 @@ export const api = {
 
   getGraph: (graphId: string) =>
     safeFetch<GraphInfo>(`/api/v1/graphs/${encodeURIComponent(graphId)}`),
+
+  listNodes: (graphId: string, ids?: string[]) => {
+    const idsParam = ids && ids.length > 0 ? `?ids=${ids.map(encodeURIComponent).join(",")}` : ""
+    return safeFetch<GraphNode[]>(
+      `/api/v1/graphs/${encodeURIComponent(graphId)}/nodes${idsParam}`,
+    )
+  },
 
   sampleNodes: (graphId: string, request: SampleNodesRequest) =>
     safeFetch<SampleNodesResponse>(
