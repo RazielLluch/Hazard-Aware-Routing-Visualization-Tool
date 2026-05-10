@@ -8,6 +8,8 @@ import type {
   BundleUpdateRequest,
   GraphInfo,
   GraphNode,
+  InferenceRequest,
+  InferenceResponse,
   Job,
   JobSummary,
   MetricsBundle,
@@ -126,6 +128,14 @@ export const api = {
         revalidate: 0,
       },
     ),
+
+  runInference: (request: InferenceRequest) =>
+    safeFetch<InferenceResponse>("/api/v1/inference", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+      revalidate: 0,
+    }),
 
   // ---- Stage 3: jobs (benchmark generation) ---------------------------------
 
