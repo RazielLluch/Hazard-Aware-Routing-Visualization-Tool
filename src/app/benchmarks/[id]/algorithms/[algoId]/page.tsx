@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation"
 
+import { TrialListAccordion } from "@/components/benchmark/TrialListAccordion"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -45,7 +46,10 @@ interface PageProps {
 export default async function AlgorithmDetailPage({ params }: PageProps) {
   const { id, algoId: algoIdRaw } = await params
   const algoId = decodeURIComponent(algoIdRaw) as AlgorithmId
-  const metricsResult = await api.getMetrics(id)
+  const [metricsResult, runsResult] = await Promise.all([
+    api.getMetrics(id),
+    api.listRunsForAlgorithm(id, algoId),
+  ])
 
   if (!metricsResult.ok) {
     return (
@@ -65,6 +69,8 @@ export default async function AlgorithmDetailPage({ params }: PageProps) {
   if (!algoMetrics) {
     notFound()
   }
+
+  const runs = runsResult.ok ? runsResult.data : []
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-6 pt-0">
@@ -129,6 +135,32 @@ export default async function AlgorithmDetailPage({ params }: PageProps) {
           </Card>
         )
       })}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Trial drill-down by rain intensity</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Expand a rain-intensity section to inspect the individual scenarios
+            this algorithm ran against. Sorted by hazard score (worst first),
+            failures grouped on top. Click <em>View environment</em> on any row
+            to render the route, blocked edges, and step-by-step playback.
+          </p>
+        </CardHeader>
+        <CardContent>
+          {runs.length === 0 ? (
+            <Alert>
+              <AlertTitle>No trial data</AlertTitle>
+              <AlertDescription>
+                Run records for <code className="font-mono">{algoId}</code> are
+                not yet on disk. Re-run <code className="font-mono">run_policies</code>{" "}
+                or kick off a fresh benchmark to populate this section.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <TrialListAccordion benchmarkId={id} algoId={algoId} runs={runs} />
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

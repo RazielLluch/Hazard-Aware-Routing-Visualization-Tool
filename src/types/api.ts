@@ -84,11 +84,18 @@ export interface RouteEdge {
   hazardFlood: number
   hazardLandslide: number
   wasReplan: boolean
+  /** Schema v3: when wasReplan is true, this is the (u, v) edge the
+   *  planner attempted before the block forced a replan. Null on legacy
+   *  v2 routes and on non-replan steps. */
+  plannedNextEdge: [string, string] | null
 }
 
 export interface RunSummary {
   scenarioId: string
   algorithmId: AlgorithmId
+  /** Schema v3: surfaced from the parent scenario so a flat list of
+   *  run summaries can be bucketed by RI without a second fetch. */
+  ri: RILevel | null
   success: boolean
   failureReason: string | null
   replanCount: number
