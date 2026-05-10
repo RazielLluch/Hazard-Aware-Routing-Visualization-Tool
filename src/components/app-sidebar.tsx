@@ -3,7 +3,6 @@
 import * as React from "react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -18,26 +17,50 @@ import {
   LayoutBottomIcon,
   PieChartIcon,
   ComputerTerminalIcon,
-  AudioWave01Icon,
   RoboticIcon,
   MapsIcon,
-  BookOpen02Icon,
 } from "@hugeicons/core-free-icons"
 
-const data = {
-  user: {
-    name: "Thesis Team",
-    email: "UC Baguio",
-    avatar: "",
+const user = {
+  name: "Thesis Team",
+  email: "UC Baguio",
+  avatar: "",
+}
+
+const teams = [
+  {
+    name: "La Trinidad Benchmark",
+    logo: <HugeiconsIcon icon={LayoutBottomIcon} strokeWidth={2} />,
+    plan: "Thesis 2026",
   },
-  teams: [
-    {
-      name: "La Trinidad Benchmark",
-      logo: <HugeiconsIcon icon={LayoutBottomIcon} strokeWidth={2} />,
-      plan: "Thesis 2026",
-    },
-  ],
-  navMain: [
+]
+
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  defaultBenchmarkId?: string | null
+  defaultScenarioId?: string | null
+}
+
+export function AppSidebar({
+  defaultBenchmarkId,
+  defaultScenarioId,
+  ...props
+}: AppSidebarProps) {
+  // Sub-items under Benchmarks are journey actions (create one, watch a
+  // single algo play, compare all of them). The playback links need a
+  // concrete (benchmark, scenario) pair; without both we surface only
+  // "+ New benchmark" so the empty state has an obvious next step.
+  const benchmarkSubItems: { title: string; url: string }[] = [
+    { title: "+ New benchmark", url: "/benchmarks/new" },
+  ]
+  if (defaultBenchmarkId && defaultScenarioId) {
+    const base = `/benchmarks/${encodeURIComponent(defaultBenchmarkId)}/scenarios/${encodeURIComponent(defaultScenarioId)}`
+    benchmarkSubItems.push(
+      { title: "Single playback", url: `${base}?mode=single` },
+      { title: "Compare playback", url: `${base}?mode=multi` },
+    )
+  }
+
+  const navMain = [
     {
       title: "Overview",
       url: "/",
@@ -45,50 +68,33 @@ const data = {
       isActive: true,
     },
     {
-      title: "Benchmarks",
-      url: "/benchmarks",
-      icon: <HugeiconsIcon icon={ComputerTerminalIcon} strokeWidth={2} />,
-      items: [
-        { title: "la_trinidad_mini", url: "/benchmarks/la_trinidad_mini" },
-      ],
-    },
-    {
-      title: "Compare",
-      url: "/compare",
-      icon: <HugeiconsIcon icon={AudioWave01Icon} strokeWidth={2} />,
-    },
-    {
       title: "Live Demo",
       url: "/demo",
       icon: <HugeiconsIcon icon={RoboticIcon} strokeWidth={2} />,
     },
     {
-      title: "Graph Explorer",
-      url: "/graph",
+      title: "Benchmarks",
+      url: "/benchmarks",
+      icon: <HugeiconsIcon icon={ComputerTerminalIcon} strokeWidth={2} />,
+      items: benchmarkSubItems,
+    },
+    {
+      title: "Bundles",
+      url: "/bundles",
       icon: <HugeiconsIcon icon={MapsIcon} strokeWidth={2} />,
     },
-  ],
-  projects: [
-    {
-      name: "Methodology",
-      url: "/methodology",
-      icon: <HugeiconsIcon icon={BookOpen02Icon} strokeWidth={2} />,
-    },
-  ],
-}
+  ]
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <TeamSwitcher teams={teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} label="Workspace" />
-        <NavProjects projects={data.projects} />
+        <NavMain items={navMain} label="Workspace" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

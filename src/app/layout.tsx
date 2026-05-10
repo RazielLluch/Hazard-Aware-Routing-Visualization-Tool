@@ -9,6 +9,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { resolveJourneyContext } from "@/lib/journey";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -28,17 +29,22 @@ export const metadata: Metadata = {
     "A Deep Reinforcement Learning Framework for Hazard-Aware Routing in Disaster-Prone Rural Road Networks: Leveraging Project NOAH Data for Last-Mile Logistics",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { defaultBenchmarkId, defaultScenarioId } = await resolveJourneyContext();
+
   return (
     <html lang="en" className={cn("font-sans", inter.variable)}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <TooltipProvider>
           <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar
+              defaultBenchmarkId={defaultBenchmarkId}
+              defaultScenarioId={defaultScenarioId}
+            />
             <SidebarInset>
               <SiteHeader />
               {children}
