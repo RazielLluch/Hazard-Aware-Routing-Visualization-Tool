@@ -177,12 +177,21 @@ export interface InferenceRequest {
   depot: string | LatLng
   deliveryStops: (string | LatLng)[]
   rainLevel: RainLevel
-  profile: Profile
+  algorithm?: AlgorithmId | null
+  profile?: Profile | null
 }
 
 export interface InferenceResponse extends Run {
   modelVersion: string
   inferenceMs: number
+  /** Schema v3: scenario context surfaced alongside the run for /demo
+   *  to render BlockedEdgesLayer + synthesise a Scenario for
+   *  ScenarioPlaybackShell without a second fetch. */
+  graphId: string
+  ri: RILevel
+  startNode: string
+  deliveryNodes: string[]
+  blockedEdges: [string, string][]
 }
 
 export interface InferenceHealth {

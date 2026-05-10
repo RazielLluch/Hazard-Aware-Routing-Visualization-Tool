@@ -13,6 +13,10 @@ interface NavigationPanelProps {
     landslideVisible: boolean;
     setFloodVisible: (val: boolean) => void;
     setLandslideVisible: (val: boolean) => void;
+    /** Optional override for the Execute button. When provided, replaces the
+     *  legacy routeStore.addRouteCall path with a caller-supplied handler. */
+    onExecute?: () => void;
+    executeLabel?: string;
 }
 
 function HazardsCheckboxes({
@@ -52,6 +56,8 @@ export default function NavigationPanel({
                                             landslideVisible,
                                             setFloodVisible,
                                             setLandslideVisible,
+                                            onExecute,
+                                            executeLabel,
                                         }: NavigationPanelProps) {
 
     return (
@@ -62,7 +68,7 @@ export default function NavigationPanel({
 
                     <RouteSelector />
 
-                    <ExecuteButton />
+                    <ExecuteButton onClick={onExecute} text={executeLabel} />
 
                     <HazardsCheckboxes
                         floodVisible={floodVisible}
