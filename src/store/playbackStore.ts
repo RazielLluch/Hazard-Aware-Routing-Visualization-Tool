@@ -19,6 +19,13 @@ interface PlaybackStateSlice {
   scenarioId: string | null
   algorithmId: AlgorithmId | null
   run: Run | null
+  /**
+   * Multi-run mode (Stage 6). When populated, MultiRunPlaybackLayer
+   * renders every visible algorithm simultaneously. Empty {} means
+   * single-run mode is active and ``run`` is the source of truth.
+   */
+  runs: Partial<Record<AlgorithmId, Run>>
+  visibleAlgorithms: AlgorithmId[]
   currentStep: number
   speed: PlaybackSpeed
   loop: boolean
@@ -32,6 +39,15 @@ interface PlaybackActionSlice {
     algorithmId: AlgorithmId,
     run: Run,
   ) => void
+  /** Multi-run loader. Replaces ``runs`` entirely; ``visibleAlgorithms``
+   * defaults to all keys. Single-run ``run`` field is set to whichever
+   * run has the most edges so playback timing has a sensible default. */
+  loadMulti: (
+    benchmarkId: string,
+    scenarioId: string,
+    runs: Partial<Record<AlgorithmId, Run>>,
+  ) => void
+  toggleAlgorithmVisibility: (id: AlgorithmId) => void
   setError: (error: string) => void
   play: () => void
   pause: () => void
@@ -51,6 +67,8 @@ const INITIAL: PlaybackStateSlice = {
   scenarioId: null,
   algorithmId: null,
   run: null,
+  runs: {},
+  visibleAlgorithms: [],
   currentStep: 0,
   speed: 1,
   loop: false,
@@ -67,9 +85,46 @@ export const usePlaybackStore = create<PlaybackStore>((set, get) => ({
       scenarioId,
       algorithmId,
       run,
+      runs: {},
+      visibleAlgorithms: [],
       currentStep: 0,
       error: null,
     }),
+
+  loadMulti: (benchmarkId, scenarioId, runs) => {
+    const algorithmIds = Object.keys(runs) as AlgorithmId[]
+    // Pick the run with the most edges as the playback timing reference.
+    let primaryAlgo: AlgorithmId | null = null
+    let primaryRun: Run | null = null
+    let maxEdges = -1
+    for (const id of algorithmIds) {
+      const r = runs[id]
+      if (!r) continue
+      if (r.perEdge.length > maxEdges) {
+        maxEdges = r.perEdge.length
+        primaryAlgo = id
+        primaryRun = r
+      }
+    }
+    set({
+      state: primaryRun ? "loaded" : "idle",
+      benchmarkId,
+      scenarioId,
+      algorithmId: primaryAlgo,
+      run: primaryRun,
+      runs,
+      visibleAlgorithms: algorithmIds,
+      currentStep: 0,
+      error: null,
+    })
+  },
+
+  toggleAlgorithmVisibility: (id) =>
+    set((s) => ({
+      visibleAlgorithms: s.visibleAlgorithms.includes(id)
+        ? s.visibleAlgorithms.filter((a) => a !== id)
+        : [...s.visibleAlgorithms, id],
+    })),
 
   setError: (error) => set({ state: "error", error }),
 
