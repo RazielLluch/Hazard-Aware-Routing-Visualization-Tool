@@ -16,6 +16,7 @@ import type {
 import { AlgorithmLegend } from "./AlgorithmLegend"
 import { AlgorithmSwitcher } from "./AlgorithmSwitcher"
 import { BlockedEdgesLayer } from "./BlockedEdgesLayer"
+import { BlockEncounterMarkers } from "./BlockEncounterMarkers"
 import { MultiRunPlaybackLayer } from "./MultiRunPlaybackLayer"
 import { PlaybackControls } from "./PlaybackControls"
 import { RunPlaybackLayer } from "./RunPlaybackLayer"
@@ -144,6 +145,7 @@ export function ScenarioPlaybackShell({
           ) : (
             <RunPlaybackLayer nodesById={nodesById} />
           )}
+          {!isMulti && <BlockEncounterMarkers nodesById={nodesById} />}
         </MapContainer>
         {isMulti ? (
           <div className="absolute right-4 top-4 z-[400] max-w-xs">

@@ -50,6 +50,12 @@ export function StepHazardTimeline() {
     }
   })
   const cumulativeMax = data.length > 0 ? data[data.length - 1].cumulative : 0
+  // Step indices where the agent replanned around a blocked edge — drawn as
+  // faint vertical reference lines so the chart calls out the same moments
+  // that BlockEncounterMarkers highlights on the map.
+  const replanSteps = run.perEdge
+    .map((edge, i) => (edge.wasReplan ? i : null))
+    .filter((i): i is number => i !== null)
 
   return (
     <div className="border-t bg-background/95 px-4 py-3 backdrop-blur">
@@ -104,6 +110,17 @@ export function StepHazardTimeline() {
             dot={false}
             isAnimationActive={false}
           />
+          {replanSteps.map((stepIdx) => (
+            <ReferenceLine
+              key={`replan-line-${stepIdx}`}
+              yAxisId="per-step"
+              x={stepIdx}
+              stroke="#eab308"
+              strokeWidth={1.5}
+              strokeDasharray="1 3"
+              opacity={0.7}
+            />
+          ))}
           <ReferenceLine
             yAxisId="per-step"
             x={currentStep}
