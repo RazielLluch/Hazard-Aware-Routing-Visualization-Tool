@@ -15,6 +15,7 @@ import type {
 
 import { AlgorithmLegend } from "./AlgorithmLegend"
 import { AlgorithmSwitcher } from "./AlgorithmSwitcher"
+import { BlockedEdgesLayer } from "./BlockedEdgesLayer"
 import { MultiRunPlaybackLayer } from "./MultiRunPlaybackLayer"
 import { PlaybackControls } from "./PlaybackControls"
 import { RunPlaybackLayer } from "./RunPlaybackLayer"
@@ -133,6 +134,10 @@ export function ScenarioPlaybackShell({
           <TileLayer
             attribution="&copy; OpenStreetMap contributors"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <BlockedEdgesLayer
+            blockedEdges={scenario.blockedEdges}
+            nodesById={nodesById}
           />
           {isMulti ? (
             <MultiRunPlaybackLayer nodesById={nodesById} />

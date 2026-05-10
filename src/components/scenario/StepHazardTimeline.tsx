@@ -2,8 +2,9 @@
 
 import {
   Area,
-  AreaChart,
   CartesianGrid,
+  ComposedChart,
+  Line,
   ReferenceLine,
   XAxis,
   YAxis,
@@ -20,6 +21,7 @@ import { usePlaybackStore } from "@/store/playbackStore"
 const chartConfig = {
   hazardFlood: { label: "Flood", color: "var(--chart-1)" },
   hazardLandslide: { label: "Landslide", color: "var(--chart-3)" },
+  cumulative: { label: "Cumulative", color: "var(--chart-5)" },
 } satisfies ChartConfig
 
 export function StepHazardTimeline() {
@@ -34,19 +36,29 @@ export function StepHazardTimeline() {
     )
   }
 
-  const data = run.perEdge.map((edge, i) => ({
-    step: i,
-    hazardFlood: edge.hazardFlood,
-    hazardLandslide: edge.hazardLandslide,
-  }))
+  // Build per-step data with a running cumulative total of (flood + landslide)
+  // hazard scores. The cumulative axis lives on the right so it can scale
+  // independently of the [0,1] per-step axis on the left.
+  let runningTotal = 0
+  const data = run.perEdge.map((edge, i) => {
+    runningTotal += edge.hazardFlood + edge.hazardLandslide
+    return {
+      step: i,
+      hazardFlood: edge.hazardFlood,
+      hazardLandslide: edge.hazardLandslide,
+      cumulative: runningTotal,
+    }
+  })
+  const cumulativeMax = data.length > 0 ? data[data.length - 1].cumulative : 0
 
   return (
     <div className="border-t bg-background/95 px-4 py-3 backdrop-blur">
       <ChartContainer config={chartConfig} className="h-28 w-full">
-        <AreaChart data={data} margin={{ left: 12, right: 12, top: 8, bottom: 0 }}>
+        <ComposedChart data={data} margin={{ left: 12, right: 16, top: 8, bottom: 0 }}>
           <CartesianGrid vertical={false} />
           <XAxis dataKey="step" tickLine={false} axisLine={false} tickMargin={6} fontSize={10} />
           <YAxis
+            yAxisId="per-step"
             tickLine={false}
             axisLine={false}
             domain={[0, 1]}
@@ -54,8 +66,19 @@ export function StepHazardTimeline() {
             fontSize={10}
             width={28}
           />
+          <YAxis
+            yAxisId="cumulative"
+            orientation="right"
+            tickLine={false}
+            axisLine={false}
+            domain={[0, Math.max(1, Math.ceil(cumulativeMax))]}
+            tickFormatter={(v) => v.toFixed(0)}
+            fontSize={10}
+            width={28}
+          />
           <ChartTooltip content={<ChartTooltipContent />} />
           <Area
+            yAxisId="per-step"
             dataKey="hazardFlood"
             type="monotone"
             stroke="var(--color-hazardFlood)"
@@ -64,6 +87,7 @@ export function StepHazardTimeline() {
             stackId="hazards"
           />
           <Area
+            yAxisId="per-step"
             dataKey="hazardLandslide"
             type="monotone"
             stroke="var(--color-hazardLandslide)"
@@ -71,13 +95,23 @@ export function StepHazardTimeline() {
             fillOpacity={0.35}
             stackId="hazards"
           />
+          <Line
+            yAxisId="cumulative"
+            dataKey="cumulative"
+            type="monotone"
+            stroke="var(--color-cumulative)"
+            strokeWidth={2}
+            dot={false}
+            isAnimationActive={false}
+          />
           <ReferenceLine
+            yAxisId="per-step"
             x={currentStep}
             stroke="var(--foreground)"
             strokeWidth={2}
             strokeDasharray="3 3"
           />
-        </AreaChart>
+        </ComposedChart>
       </ChartContainer>
     </div>
   )

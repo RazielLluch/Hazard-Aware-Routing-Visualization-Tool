@@ -2,6 +2,7 @@
 
 import { HugeiconsIcon } from "@hugeicons/react"
 import { PlayIcon, PauseIcon, ReloadIcon } from "@hugeicons/core-free-icons"
+import { useMemo } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -29,6 +30,17 @@ export function PlaybackControls() {
   const isPlaying = state === "playing"
   const isFinished = state === "finished"
   const disabled = !run || state === "idle" || state === "loading" || state === "error"
+
+  // Cumulative hazard accrued through the current step.
+  const accruedHazard = useMemo(() => {
+    if (!run || run.perEdge.length === 0) return 0
+    const upTo = Math.min(currentStep, run.perEdge.length)
+    let total = 0
+    for (let i = 0; i < upTo; i++) {
+      total += run.perEdge[i].hazardFlood + run.perEdge[i].hazardLandslide
+    }
+    return total
+  }, [run, currentStep])
 
   return (
     <div className="flex items-center gap-3 border-t bg-background/95 px-4 py-3 backdrop-blur">
@@ -59,6 +71,13 @@ export function PlaybackControls() {
 
       <div className="font-mono text-xs tabular-nums text-muted-foreground">
         {currentStep} / {totalSteps}
+      </div>
+
+      <div
+        className="font-mono text-xs tabular-nums text-muted-foreground"
+        title="Cumulative hazard score accrued through this step"
+      >
+        Hazard: {accruedHazard.toFixed(2)}
       </div>
 
       <Select
