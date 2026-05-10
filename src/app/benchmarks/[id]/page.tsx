@@ -73,13 +73,17 @@ export default async function BenchmarkDetailPage({ params }: PageProps) {
                 <Card className="h-full">
                   <CardHeader>
                     <CardTitle className="font-mono text-base">{algoId}</CardTitle>
-                    {successAll ? (
+                    {successAll && successAll.mean !== null ? (
                       <CardDescription>
                         Success rate {(successAll.mean * 100).toFixed(0)}% · n={successAll.n}
                       </CardDescription>
                     ) : (
                       <CardDescription>
-                        {metricsResult.ok ? "no metrics yet" : "metrics unavailable"}
+                        {successAll
+                          ? `no successful runs · n=${successAll.n}`
+                          : metricsResult.ok
+                            ? "no metrics yet"
+                            : "metrics unavailable"}
                       </CardDescription>
                     )}
                   </CardHeader>

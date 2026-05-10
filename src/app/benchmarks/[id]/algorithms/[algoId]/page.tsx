@@ -30,6 +30,14 @@ const METRIC_KEYS = [
   "runtime",
 ] as const
 
+/** Render a nullable number as a fixed-precision string, or "—" when null.
+ *  Stats are null when a (algorithm, RI, metric) bucket has zero
+ *  observations -- e.g. hazard_exposure at RI4-RI5 on benchmarks where
+ *  every algorithm has 0% success.
+ */
+const fmt = (v: number | null | undefined, digits = 3): string =>
+  v === null || v === undefined ? "—" : v.toFixed(digits)
+
 interface PageProps {
   params: Promise<{ id: string; algoId: string }>
 }
@@ -101,16 +109,16 @@ export default async function AlgorithmDetailPage({ params }: PageProps) {
                         </TableCell>
                         <TableCell className="text-right font-mono">{bucket.n}</TableCell>
                         <TableCell className="text-right font-mono">
-                          {bucket.mean.toFixed(3)}
+                          {fmt(bucket.mean)}
                         </TableCell>
                         <TableCell className="text-right font-mono">
-                          {bucket.stdev.toFixed(3)}
+                          {fmt(bucket.stdev)}
                         </TableCell>
                         <TableCell className="text-right font-mono">
-                          {bucket.min.toFixed(3)}
+                          {fmt(bucket.min)}
                         </TableCell>
                         <TableCell className="text-right font-mono">
-                          {bucket.max.toFixed(3)}
+                          {fmt(bucket.max)}
                         </TableCell>
                       </TableRow>
                     )
