@@ -108,10 +108,11 @@ export interface Run extends RunSummary {
 
 export interface MetricBucket {
   n: number
-  mean: number
-  stdev: number
-  min: number
-  max: number
+  /** Stats are null when the bucket has zero observations. */
+  mean: number | null
+  stdev: number | null
+  min: number | null
+  max: number | null
 }
 
 export type MetricsByRI = Record<string, MetricBucket>
@@ -181,4 +182,82 @@ export interface InferenceHealth {
   loaded: Partial<Record<Profile, number[]>>
   device: string
   isWarm: boolean
+}
+
+// ---- Stage 3: jobs (benchmark generation) -----------------------------------
+
+export type JobStage = "scenario_gen" | "run_policies" | "evaluate"
+export type JobStatus = "queued" | "running" | "succeeded" | "failed"
+export type JobKind = "benchmark_generation"
+
+export interface JobSummary {
+  jobId: string
+  kind: JobKind
+  status: JobStatus
+  startedAt: string
+  finishedAt: string | null
+  currentStage: JobStage | null
+  resultPath: string | null
+}
+
+export interface Job extends JobSummary {
+  config: Record<string, unknown>
+  error: string | null
+}
+
+export interface JobEvent {
+  ts: string
+  stage: JobStage
+  current: number
+  total: number
+  message: string
+}
+
+export interface BenchmarkCreateRequest {
+  benchmarkId: string
+  graphId: string
+  masterSeed?: number
+  nScenarios?: number
+  kDeliveries?: number
+  rainIntensities?: RILevel[]
+  activationStrategy?: string
+  sampler?: "uniform_open" | "scc_restricted"
+  longitudinal?: boolean
+  algorithms?: AlgorithmId[]
+  /** Optional: pre-fill scenario_idx 0 with a saved (depot, stops) bundle.
+   *  Bundle must already exist for the chosen graphId. */
+  bundleName?: string
+}
+
+// ---- Stage 4: node bundles ---------------------------------------------------
+
+export interface Bundle {
+  name: string
+  graphId: string
+  depot: string
+  stops: string[]
+  createdAt: string
+  updatedAt: string
+  description: string | null
+}
+
+export interface BundleSummary {
+  name: string
+  graphId: string
+  numStops: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface BundleCreateRequest {
+  name: string
+  depot: string
+  stops: string[]
+  description?: string
+}
+
+export interface BundleUpdateRequest {
+  depot?: string
+  stops?: string[]
+  description?: string
 }

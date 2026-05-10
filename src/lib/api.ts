@@ -1,8 +1,15 @@
 import type {
   Benchmark,
+  BenchmarkCreateRequest,
   BenchmarkSummary,
+  Bundle,
+  BundleCreateRequest,
+  BundleSummary,
+  BundleUpdateRequest,
   GraphInfo,
   GraphNode,
+  Job,
+  JobSummary,
   MetricsBundle,
   Page,
   Run,
@@ -118,5 +125,65 @@ export const api = {
         body: JSON.stringify(request),
         revalidate: 0,
       },
+    ),
+
+  // ---- Stage 3: jobs (benchmark generation) ---------------------------------
+
+  createBenchmark: (request: BenchmarkCreateRequest) =>
+    safeFetch<JobSummary>("/api/v1/benchmarks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+      revalidate: 0,
+    }),
+
+  listJobs: () => safeFetch<JobSummary[]>("/api/v1/jobs", { revalidate: 0 }),
+
+  getJob: (jobId: string) =>
+    safeFetch<Job>(`/api/v1/jobs/${encodeURIComponent(jobId)}`, { revalidate: 0 }),
+
+  jobStreamUrl: (jobId: string): string =>
+    `${API_BASE}/api/v1/jobs/${encodeURIComponent(jobId)}/stream`,
+
+  // ---- Stage 4: bundles -----------------------------------------------------
+
+  listBundles: (graphId: string) =>
+    safeFetch<BundleSummary[]>(
+      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles`,
+      { revalidate: 0 },
+    ),
+
+  getBundle: (graphId: string, name: string) =>
+    safeFetch<Bundle>(
+      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles/${encodeURIComponent(name)}`,
+      { revalidate: 0 },
+    ),
+
+  createBundle: (graphId: string, request: BundleCreateRequest) =>
+    safeFetch<Bundle>(
+      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request),
+        revalidate: 0,
+      },
+    ),
+
+  updateBundle: (graphId: string, name: string, request: BundleUpdateRequest) =>
+    safeFetch<Bundle>(
+      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles/${encodeURIComponent(name)}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(request),
+        revalidate: 0,
+      },
+    ),
+
+  deleteBundle: (graphId: string, name: string) =>
+    safeFetch<null>(
+      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles/${encodeURIComponent(name)}`,
+      { method: "DELETE", revalidate: 0 },
     ),
 }
