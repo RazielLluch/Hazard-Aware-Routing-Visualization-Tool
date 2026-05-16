@@ -1,279 +1,230 @@
 export type RILevel = "RI1" | "RI2" | "RI3" | "RI4" | "RI5"
 
-export type AlgorithmId =
-  | "NNA-Dijkstra"
-  | "NNA-AStar"
-  | "NNA-Dijkstra-HA"
-  | "NNA-Dijkstra-Blind"
-  | "NNA-AStar-Blind"
-  | "NNA-Dijkstra-HA-Blind"
-  | "DQN@balanced_HF"
-  | "DQN@fast_HF"
-  | "DQN@safe_HF"
+/**
+ * Algorithm identifier. Runtime-validated against the /api/v2/algorithms
+ * catalog rather than a static union — the 7 macro ids (3 learned + the exact
+ * oracle + 3 greedy baselines) live on the backend. See AlgorithmEntry.
+ */
+export type AlgorithmId = string
+
+export type AlgorithmCategory = "learned" | "baseline" | "oracle"
+
+/** One entry in the /api/v2/algorithms comparison-surface catalog (snake_case
+ *  to mirror the v2 API 1:1). */
+export interface AlgorithmEntry {
+  id: AlgorithmId
+  label: string
+  category: AlgorithmCategory
+  requires_model: boolean
+  aliases: string[]
+}
 
 export type Profile = "balanced" | "fast" | "safe"
 
-export type RainLevel = 1 | 2 | 3 | 4 | 5
+// ---------------------------------------------------------------------------
+// v2 (Macro-DDQN) — snake_case to mirror the /api/v2 contract 1:1, so no
+// camelCase mapping layer is needed between the API and the compare UI.
+// ---------------------------------------------------------------------------
 
-export interface LatLng {
-  lat: number
-  lng: number
+export type CohortId = "random" | "hazard_opportunity" | "risk_time_tradeoff"
+
+/** A pane-local (profile, algorithm) selection on the / page. */
+export interface PaneSelection {
+  profile: Profile
+  algorithm: AlgorithmId
 }
 
-export interface Page<T> {
+// ---- /api/v2/inference + /scenarios/{id}/runs/live ----
+
+export interface NodePayloadV2 {
+  id: string
+  x: number
+  y: number
+  lng: number
+  lat: number
+}
+
+export interface RouteMetricsV2 {
+  objective: number
+  time_min: number
+  distance_m: number
+  distance_km: number
+  flood_exposure: number
+  landslide_exposure: number
+  blockage_exposure: number
+  risk_exposure: number
+  common_risk_exposure: number
+  hops: number
+}
+
+export interface RouteSegmentV2 {
+  u: string
+  v: string
+  coordinates: NodePayloadV2[]
+  length_m: number
+  base_time_min: number
+  travel_time_min: number
+  objective: number
+  flood_hazard: number
+  landslide_hazard: number
+  flood_active: 0 | 1
+  landslide_active: 0 | 1
+  flood_blocked: 0 | 1
+  landslide_blocked: 0 | 1
+  blocked: 0 | 1
+  flood_exposure: number
+  landslide_exposure: number
+  blockage_exposure: number
+  risk_exposure: number
+  common_risk_exposure: number
+}
+
+export interface RouteLegV2 {
+  source: string
+  target: string
+  path_nodes: string[]
+  metrics: RouteMetricsV2
+  segments: RouteSegmentV2[]
+}
+
+export interface InferenceRequestV2 {
+  algorithm: AlgorithmId
+  profile: Profile
+  ri_key: RILevel
+  start: string
+  deliveries: string[]
+  max_steps?: number
+}
+
+export interface InferenceResponseV2 {
+  algorithm: AlgorithmId
+  profile: Profile
+  ri_key: RILevel
+  artefact_id: string | null
+  delivered: number
+  // `success` intentionally absent — always true under soft-blocking.
+  failure_reason: string
+  start: NodePayloadV2
+  deliveries: NodePayloadV2[]
+  visit_order: string[]
+  metrics: RouteMetricsV2
+  legs: RouteLegV2[]
+}
+
+// ---- /api/v2/graph ----
+
+export interface GraphExportNode {
+  id: string
+  x: number
+  y: number
+}
+
+export interface NetworkEdge {
+  u: string
+  v: string
+  base_time: number
+  travel_time: number
+  objective: number
+  length_m: number
+  flood: number
+  landslide: number
+  combined: number // max(flood, landslide)
+  flood_active: 0 | 1
+  landslide_active: 0 | 1
+  flood_blocked: 0 | 1
+  landslide_blocked: 0 | 1
+  blocked: 0 | 1
+}
+
+export interface GraphExport {
+  nodes: GraphExportNode[]
+  /** key = "<RI>:<profile>", e.g. "RI3:balanced" */
+  networks: Record<string, NetworkEdge[]>
+  profiles: Profile[]
+  ri_keys: RILevel[]
+  algorithms: AlgorithmId[]
+  artefact_id: string | null
+}
+
+// ---- /api/v2/scenario_sets + /scenarios + /scenarios/{id}/runs ----
+
+export interface ScenarioSetSummary {
+  cohort: CohortId
+  label: string
+  counts_by_ri: Record<string, number>
+  total: number
+  artefact_id: string | null
+}
+
+export interface ScenarioSetScenario {
+  scenario_id: string
+  ri_key: RILevel
+  start: string
+  deliveries: string[]
+}
+
+/** Paginated scenario list — snake_case `page_size` mirrors the v2 API. */
+export interface PageV2<T> {
   items: T[]
   page: number
-  pageSize: number
+  page_size: number
   total: number
 }
 
-export interface RIDistribution {
-  RI1: number
-  RI2: number
-  RI3: number
-  RI4: number
-  RI5: number
+/** One precomputed trial row from a cohort's evaluation CSV. `success` is
+ *  intentionally absent — always 1 under soft-blocking. */
+export interface CompactResult {
+  scenario_id: string
+  ri_key: RILevel
+  profile: Profile
+  algorithm: AlgorithmId
+  delivered: number
+  objective: number
+  time_min: number
+  distance_km: number
+  flood: number
+  landslide: number
+  blockage: number
+  common_risk: number
+  hops: number
+  visit_order: string[]
 }
 
-export interface BenchmarkSummary {
-  benchmarkId: string
-  graphId: string
-  numScenarios: number
-  numDeliveries: number
-  algorithms: AlgorithmId[]
-  riDistribution: RIDistribution
-}
-
-export interface Benchmark extends BenchmarkSummary {
-  masterSeed: number
-  samplingPolicy: string
-  activationMode: string
-  feasibilityFiltered: boolean
-  graphPath: string
-  generatedAt: string | null
-}
-
-export interface ScenarioListItem {
-  scenarioId: string
-  rainLevel: RainLevel
-  ri: RILevel
-  numDeliveries: number
-  numBlockedEdges: number
-}
-
-export interface Scenario {
-  scenarioId: string
-  benchmarkId: string
-  graphId: string
-  rainLevel: RainLevel
-  ri: RILevel
-  startNode: string
-  deliveryNodes: string[]
-  blockedEdges: [string, string][]
-  maxSteps: number
-  activationMode: string
-  activationSeed: number | null
-}
-
-export interface RouteEdge {
-  step: number
-  u: string
-  v: string
-  lengthM: number
-  travelTime: number
-  hazardFlood: number
-  hazardLandslide: number
-  wasReplan: boolean
-  /** Schema v3: when wasReplan is true, this is the (u, v) edge the
-   *  planner attempted before the block forced a replan. Null on legacy
-   *  v2 routes and on non-replan steps. */
-  plannedNextEdge: [string, string] | null
-}
-
-export interface RunSummary {
-  scenarioId: string
-  algorithmId: AlgorithmId
-  /** Schema v3: surfaced from the parent scenario so a flat list of
-   *  run summaries can be bucketed by RI without a second fetch. */
-  ri: RILevel | null
-  success: boolean
-  failureReason: string | null
-  replanCount: number
-  wallTimeMs: number
-  totalTravelTime: number | null
-  totalDistanceM: number | null
-  totalHazardScore: number | null
-}
-
-export interface Run extends RunSummary {
-  visitOrder: string[]
-  edgeSequence: [string, string][]
-  perEdge: RouteEdge[]
-  policyMetadata: Record<string, unknown>
-  algorithmConfigHash: string | null
-}
-
-export interface MetricBucket {
+/** One faceted metric cell from `GET /api/v2/metrics`, meaned over the trials
+ *  in the `(cohort, profile, ri_key, algorithm)` bucket. `success_rate` is
+ *  intentionally absent — always 1.0 under soft-blocking. */
+export interface MetricFacetV2 {
+  cohort: string
+  profile: Profile
+  ri_key: RILevel
+  algorithm: AlgorithmId
+  category: AlgorithmCategory
   n: number
-  /** Stats are null when the bucket has zero observations. */
-  mean: number | null
-  stdev: number | null
-  min: number | null
-  max: number | null
+  objective: number
+  travel_time_min: number
+  distance_km: number
+  common_risk_exposure: number
+  blockage_exposure: number
+  hops: number
+  replan_count: number
 }
 
-export type MetricsByRI = Record<string, MetricBucket>
-export type MetricsByName = Record<string, MetricsByRI>
-
-export interface MetricsBundle {
-  benchmarkId: string
-  algorithms: Record<AlgorithmId, MetricsByName>
+/** Manuscript baseline-reduction row: percent improvement of a learned model
+ *  over one comparator — `100 * (mean_baseline - mean_model) / mean_baseline`,
+ *  so a positive value means the model lowered that (lower-is-better) metric. */
+export interface BaselineReductionV2 {
+  profile: Profile
+  ri_key: RILevel
+  model: AlgorithmId
+  baseline: AlgorithmId
+  metric: string
+  mean_model: number
+  mean_baseline: number
+  reduction_pct: number
 }
 
-export interface GraphInfo {
-  graphId: string
-  crs: string
-  numNodes: number
-  numEdges: number
-  bbox: [number, number, number, number] | null
-  source: string
-}
-
-export interface GraphNode {
-  id: string
-  location: LatLng
-  streetCount: number | null
-  highway: string | null
-}
-
-export interface GraphEdge {
-  u: string
-  v: string
-  length: number
-  travelTimeMin: number
-  floodHazard: number
-  landslideHazard: number
-  combinedHazard: number
-  geometry: LatLng[]
-  highway: string | null
-  name: string | null
-}
-
-export interface SampleNodesRequest {
-  rainLevel: RainLevel
-  k: number
-  seed?: number
-}
-
-export interface SampleNodesResponse {
-  feasible: boolean
-  sccSize: number
-  seed: number
-  depot: GraphNode | null
-  nodes: GraphNode[]
-}
-
-export interface InferenceRequest {
-  depot: string | LatLng
-  deliveryStops: (string | LatLng)[]
-  rainLevel: RainLevel
-  algorithm?: AlgorithmId | null
-  profile?: Profile | null
-}
-
-export interface InferenceResponse extends Run {
-  modelVersion: string
-  inferenceMs: number
-  /** Schema v3: scenario context surfaced alongside the run for /demo
-   *  to render BlockedEdgesLayer + synthesise a Scenario for
-   *  ScenarioPlaybackShell without a second fetch. */
-  graphId: string
-  ri: RILevel
-  startNode: string
-  deliveryNodes: string[]
-  blockedEdges: [string, string][]
-}
-
-export interface InferenceHealth {
-  loaded: Partial<Record<Profile, number[]>>
-  device: string
-  isWarm: boolean
-}
-
-// ---- Stage 3: jobs (benchmark generation) -----------------------------------
-
-export type JobStage = "scenario_gen" | "run_policies" | "evaluate"
-export type JobStatus = "queued" | "running" | "succeeded" | "failed"
-export type JobKind = "benchmark_generation"
-
-export interface JobSummary {
-  jobId: string
-  kind: JobKind
-  status: JobStatus
-  startedAt: string
-  finishedAt: string | null
-  currentStage: JobStage | null
-  resultPath: string | null
-}
-
-export interface Job extends JobSummary {
-  config: Record<string, unknown>
-  error: string | null
-}
-
-export interface JobEvent {
-  ts: string
-  stage: JobStage
-  current: number
-  total: number
-  message: string
-}
-
-export interface BenchmarkCreateRequest {
-  benchmarkId: string
-  graphId: string
-  masterSeed?: number
-  nScenarios?: number
-  kDeliveries?: number
-  rainIntensities?: RILevel[]
-  activationStrategy?: string
-  sampler?: "uniform_open" | "scc_restricted"
-  longitudinal?: boolean
-  algorithms?: AlgorithmId[]
-  /** Optional: pre-fill scenario_idx 0 with a saved (depot, stops) bundle.
-   *  Bundle must already exist for the chosen graphId. */
-  bundleName?: string
-}
-
-// ---- Stage 4: node bundles ---------------------------------------------------
-
-export interface Bundle {
-  name: string
-  graphId: string
-  depot: string
-  stops: string[]
-  createdAt: string
-  updatedAt: string
-  description: string | null
-}
-
-export interface BundleSummary {
-  name: string
-  graphId: string
-  numStops: number
-  createdAt: string
-  updatedAt: string
-}
-
-export interface BundleCreateRequest {
-  name: string
-  depot: string
-  stops: string[]
-  description?: string
-}
-
-export interface BundleUpdateRequest {
-  depot?: string
-  stops?: string[]
-  description?: string
+export interface MetricsResponseV2 {
+  cohort: string
+  facets: MetricFacetV2[]
+  baseline_reductions: BaselineReductionV2[]
 }

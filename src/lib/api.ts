@@ -1,25 +1,16 @@
 import type {
-  Benchmark,
-  BenchmarkCreateRequest,
-  BenchmarkSummary,
-  Bundle,
-  BundleCreateRequest,
-  BundleSummary,
-  BundleUpdateRequest,
-  GraphInfo,
-  GraphNode,
-  InferenceRequest,
-  InferenceResponse,
-  Job,
-  JobSummary,
-  MetricsBundle,
-  Page,
-  Run,
-  RunSummary,
-  SampleNodesRequest,
-  SampleNodesResponse,
-  Scenario,
-  ScenarioListItem,
+  AlgorithmEntry,
+  CohortId,
+  CompactResult,
+  GraphExport,
+  InferenceRequestV2,
+  InferenceResponseV2,
+  MetricsResponseV2,
+  PageV2,
+  PaneSelection,
+  RILevel,
+  ScenarioSetScenario,
+  ScenarioSetSummary,
 } from "@/types/api"
 
 const API_BASE =
@@ -69,131 +60,65 @@ function qs(params: Record<string, string | number | undefined>): string {
   return s ? `?${s}` : ""
 }
 
-export const api = {
+// ---------------------------------------------------------------------------
+// v2 (Macro-DDQN) — the comparison surface. /api/v1 was removed when the
+// app collapsed to a single Compare-only route.
+// ---------------------------------------------------------------------------
+
+export const v2 = {
   baseUrl: API_BASE,
 
-  listBenchmarks: () => safeFetch<BenchmarkSummary[]>("/api/v1/benchmarks"),
+  listAlgorithms: () =>
+    safeFetch<AlgorithmEntry[]>("/api/v2/algorithms", { revalidate: 3600 }),
 
-  getBenchmark: (id: string) =>
-    safeFetch<Benchmark>(`/api/v1/benchmarks/${encodeURIComponent(id)}`),
+  getGraphExport: () =>
+    // The graph is invariant within a config; cached aggressively. The backend
+    // also serves an ETag, so a revalidation is a cheap 304.
+    safeFetch<GraphExport>("/api/v2/graph", { revalidate: 3600 }),
 
-  listScenarios: (
-    id: string,
-    opts: { ri?: number; page?: number; pageSize?: number } = {},
-  ) =>
-    safeFetch<Page<ScenarioListItem>>(
-      `/api/v1/benchmarks/${encodeURIComponent(id)}/scenarios${qs(opts)}`,
-    ),
+  listScenarioSets: () =>
+    safeFetch<ScenarioSetSummary[]>("/api/v2/scenario_sets", { revalidate: 600 }),
 
-  getScenario: (id: string, sid: string) =>
-    safeFetch<Scenario>(
-      `/api/v1/benchmarks/${encodeURIComponent(id)}/scenarios/${encodeURIComponent(sid)}`,
-    ),
+  listScenarios: (opts: {
+    cohort: CohortId
+    ri?: RILevel
+    page?: number
+    pageSize?: number
+  }) =>
+    safeFetch<PageV2<ScenarioSetScenario>>(`/api/v2/scenarios${qs(opts)}`, {
+      revalidate: 600,
+    }),
 
-  listRunsForAlgorithm: (id: string, algoId: string) =>
-    safeFetch<RunSummary[]>(
-      `/api/v1/benchmarks/${encodeURIComponent(id)}/runs/${encodeURIComponent(algoId)}`,
-    ),
-
-  listRunsForScenario: (id: string, sid: string) =>
-    safeFetch<RunSummary[]>(
-      `/api/v1/benchmarks/${encodeURIComponent(id)}/scenarios/${encodeURIComponent(sid)}/runs`,
-    ),
-
-  getRun: (id: string, sid: string, algoId: string) =>
-    safeFetch<Run>(
-      `/api/v1/benchmarks/${encodeURIComponent(id)}/scenarios/${encodeURIComponent(sid)}/runs/${encodeURIComponent(algoId)}`,
-    ),
-
-  getMetrics: (id: string) =>
-    safeFetch<MetricsBundle>(`/api/v1/benchmarks/${encodeURIComponent(id)}/metrics`),
-
-  getGraph: (graphId: string) =>
-    safeFetch<GraphInfo>(`/api/v1/graphs/${encodeURIComponent(graphId)}`),
-
-  listNodes: (graphId: string, ids?: string[]) => {
-    const idsParam = ids && ids.length > 0 ? `?ids=${ids.map(encodeURIComponent).join(",")}` : ""
-    return safeFetch<GraphNode[]>(
-      `/api/v1/graphs/${encodeURIComponent(graphId)}/nodes${idsParam}`,
-    )
-  },
-
-  sampleNodes: (graphId: string, request: SampleNodesRequest) =>
-    safeFetch<SampleNodesResponse>(
-      `/api/v1/graphs/${encodeURIComponent(graphId)}/sample-nodes`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
-        revalidate: 0,
-      },
-    ),
-
-  runInference: (request: InferenceRequest) =>
-    safeFetch<InferenceResponse>("/api/v1/inference", {
+  runInference: (request: InferenceRequestV2) =>
+    safeFetch<InferenceResponseV2>("/api/v2/inference", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
       revalidate: 0,
     }),
 
-  // ---- Stage 3: jobs (benchmark generation) ---------------------------------
+  getRun: (scenarioId: string, sel: PaneSelection & { cohort?: CohortId }) =>
+    safeFetch<CompactResult>(
+      `/api/v2/scenarios/${encodeURIComponent(scenarioId)}/runs${qs({
+        profile: sel.profile,
+        algorithm: sel.algorithm,
+        cohort: sel.cohort,
+      })}`,
+      { revalidate: 600 },
+    ),
 
-  createBenchmark: (request: BenchmarkCreateRequest) =>
-    safeFetch<JobSummary>("/api/v1/benchmarks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(request),
-      revalidate: 0,
+  runLive: (scenarioId: string, sel: PaneSelection & { cohort?: CohortId }) =>
+    safeFetch<InferenceResponseV2>(
+      `/api/v2/scenarios/${encodeURIComponent(scenarioId)}/runs/live${qs({
+        profile: sel.profile,
+        algorithm: sel.algorithm,
+        cohort: sel.cohort,
+      })}`,
+      { revalidate: 0 },
+    ),
+
+  getMetrics: (cohort: CohortId = "random") =>
+    safeFetch<MetricsResponseV2>(`/api/v2/metrics${qs({ cohort })}`, {
+      revalidate: 600,
     }),
-
-  listJobs: () => safeFetch<JobSummary[]>("/api/v1/jobs", { revalidate: 0 }),
-
-  getJob: (jobId: string) =>
-    safeFetch<Job>(`/api/v1/jobs/${encodeURIComponent(jobId)}`, { revalidate: 0 }),
-
-  jobStreamUrl: (jobId: string): string =>
-    `${API_BASE}/api/v1/jobs/${encodeURIComponent(jobId)}/stream`,
-
-  // ---- Stage 4: bundles -----------------------------------------------------
-
-  listBundles: (graphId: string) =>
-    safeFetch<BundleSummary[]>(
-      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles`,
-      { revalidate: 0 },
-    ),
-
-  getBundle: (graphId: string, name: string) =>
-    safeFetch<Bundle>(
-      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles/${encodeURIComponent(name)}`,
-      { revalidate: 0 },
-    ),
-
-  createBundle: (graphId: string, request: BundleCreateRequest) =>
-    safeFetch<Bundle>(
-      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
-        revalidate: 0,
-      },
-    ),
-
-  updateBundle: (graphId: string, name: string, request: BundleUpdateRequest) =>
-    safeFetch<Bundle>(
-      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles/${encodeURIComponent(name)}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(request),
-        revalidate: 0,
-      },
-    ),
-
-  deleteBundle: (graphId: string, name: string) =>
-    safeFetch<null>(
-      `/api/v1/graphs/${encodeURIComponent(graphId)}/bundles/${encodeURIComponent(name)}`,
-      { method: "DELETE", revalidate: 0 },
-    ),
 }
